@@ -50,25 +50,12 @@ F_USB = 48000000UL
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 OPT = 3
 
-# Q/QA Includes
-OSC             = 1
-USB_CDC         = 0
-UART            = 1
-COLOR_LCD       = 0
-COLOR_LCD_TOUCH = 0
-SYSTIME         = 0
-SDCARD          = 0
-LUFA            = 0
-RFM12_DRIVER    = 0
-FIFO            = 0
-NETWORK         = 0
-
 # Target file name (without extension).
 TARGET = main
 
 
 # List C source files here. The main target is automatically added. (C dependencies are automatically generated.)
-SRC = stdbuf.c usb/xmega_usb.c usb/usb_default_request.c usb/descriptor.c audio.c uart/uart.c osc/osc.c
+SRC = output_buffer/stdbuf.c usb/xmega_usb.c usb/usb_default_request.c usb/descriptor.c audio.c uart/uart.c osc/osc.c
 
 
 AVRDUDE_PORT = usb

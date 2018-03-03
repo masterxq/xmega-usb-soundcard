@@ -8,7 +8,7 @@
 
 #include <uart/uart.h>
 #include <osc/osc.h>
-#include "stdbuf.h"
+#include "output_buffer/stdbuf.h"
 
 #include <cfg/QA_uart_cfg.h>
 
@@ -21,13 +21,11 @@ int main(void)
 	int2x_USB48(12);
 
 //   int48_ppl_USB48();
-	
 
-	
 	PORTCFG.CLKEVOUT = PORTCFG_CLKOUTSEL_CLK1X_gc | PORTCFG_CLKOUT_PC7_gc;
 	PORTC.DIRSET = PIN7_bm;
 	_delay_ms(800);
-  uart_init(&USARTC0, 1000000, USART_RXCINTLVL_OFF_gc, NULL, false, true);
+	uart_init(&USARTC0, 1000000, USART_RXCINTLVL_OFF_gc, NULL, false, true);
 
 	stdbuf_init(&uart_c0_byte_out);
 

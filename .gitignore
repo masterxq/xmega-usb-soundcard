@@ -1,0 +1,12 @@
+*.o
+*.d
+*.lst
+*.obj
+*.cof
+*.elf
+*.map
+*.obj
+*.a90
+*.sym
+*.lnk
+*.lss

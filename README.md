@@ -36,6 +36,9 @@ As mentioned in [Uart](#uart) the data are converted in the main loop. If you wa
 ### Devices with low memory
 If you want to try to use a Device with small internal SRAM (4 KB). You can try to disable all printf outputs or change them to print_p(PSTR("string")). The strings are permanently in RAM for being faster. Settings about the buffer can directly made in audio.h for very small buffers there is possibly an adjustment of the audio.c necessary.
 
+### Striped down to minimum
+For make it easy to use the includes i normaly use are striped down to a minimum from a large avr library i wrote. So if something looks unnessesary it possibly a remaining of the complete library. This means it is absolutely possible that it is really unnessesary for this use case.
+
 ## Thank you
 **Thanks to Dean and mojo-chun**
 

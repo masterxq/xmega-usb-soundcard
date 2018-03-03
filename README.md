@@ -2,7 +2,7 @@
 
 ## Requirements
 * XMega µC with USB support
-* 8KB ram (Currently configured with big buffer so 8KB without changing the configuration)(Should be possible to get it work with 4KB for lower bitrates <=41 KHz)
+* 8KB ram (Currently configured with buffer 4KB buffer so 8KB should work)(Should be possible to get it work with 4KB for lower bitrates <=41 KHz)
 * An amplifier for the DAC outputs. An standard OPAMP should do it for the start.
 
 ## Features

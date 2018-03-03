@@ -51,4 +51,4 @@ Audio descriptor token from [LUFA][LUFALink]. Inspiration, some headers and some
 [RNGLink]:https://github.com/kuro68k/xrng
 
 ## Help needed
-I need a makefile for windows or whatever needed there. I need somebody who can test this on windows. If you like do that and if you like to share your work I would be very thankfully and share you it here for everybody.
+I need a makefile for windows or whatever needed there and I need somebody who can test this on windows. If you like do that and if you like to share your work I would be very thankfully and share you it here for everybody.

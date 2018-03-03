@@ -30,33 +30,8 @@ void audio_callback_out(USB_EP_t *ep)
 	printf("Audio in");
 }
 
-static inline void sync_mcu_freq(uint16_t size, uint8_t time)
-{
-	
-	static uint32_t clks_total;
-	static uint32_t size_total;
-	if(audio_mem.mcu_sync_counter < 8000)
-	{
-		audio_mem.mcu_sync_counter++;
-		if(audio_mem.mcu_sync_counter < 512)
-		{
-			clks_total = 0;
-			size_total = 0;
-			return;
-		}
 
-		clks_total += time;
-		size_total += size;
 
-		if(audio_mem.mcu_sync_counter == 8000)
-		{
-			uint64_t frq = clks_total * 1024;
-			frq = frq * (uint64_t)audio_mem.sampleRate;
-			frq = frq / (uint64_t)(size_total >> 1);
-			printf("cpu freq is: %lu %lu, %u\n", (uint32_t)frq, size_total, time);
-		}
-	}
-}
 
 void audio_data_out1(USB_EP_t *ep) //normaly in.. 1
 {
@@ -68,13 +43,10 @@ void audio_data_out1(USB_EP_t *ep) //normaly in.. 1
 
 	uint8_t wanted_bank = (audio_mem.last_completed_bank + 3) & AUDIO_BUFFER_INSTANCES_MASK;
 // 	uint8_t delta_to_last_free = (audio_mem.last_free_bank - wanted_bank) & AUDIO_BUFFER_INSTANCES_MASK;
-	static uint16_t old_time = 0;
-	uint16_t new_time = AUDIO_TIME_COUNTER.CNT;
-	sync_mcu_freq(bytes, new_time - old_time);
-	old_time = new_time;
+	
 	if(wanted_bank == ((audio_mem.last_free_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK)) //TODO this could be important and should be checked
 	{
-// 		printf("over1 wb: %d, lf: %d\n", wanted_bank, audio_mem.last_free_bank);
+		printf("over1 wb: %d, lf: %d\n", wanted_bank, audio_mem.last_free_bank);
 		usb_mem.ep[AUDIO_STREAM_EPADDR].ep[1].CNT = 0;
 		usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
 		return;
@@ -139,14 +111,9 @@ void audio_data_out0(USB_EP_t *ep) //out 0
 	uint8_t wanted_bank = (audio_mem.last_completed_bank + 3) & AUDIO_BUFFER_INSTANCES_MASK;
 // 	uint8_t delta_to_last_free = (audio_mem.last_free_bank - wanted_bank) & AUDIO_BUFFER_INSTANCES_MASK;
 
-	static uint16_t old_time = 0;
-	uint16_t new_time = AUDIO_TIME_COUNTER.CNT;
-	sync_mcu_freq(bytes, new_time - old_time);
-	old_time = new_time;
-
 	if(wanted_bank == ((audio_mem.last_free_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK)) //TODO this could be important and should be checked
 	{
-// 		printf("over0 wb: %d, lf: %d\n", wanted_bank, audio_mem.last_free_bank);
+		printf("over0 wb: %d, lf: %d\n", wanted_bank, audio_mem.last_free_bank);
 		usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].CNT = 0;
 		usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
 		return;
@@ -164,6 +131,72 @@ void audio_data_out0(USB_EP_t *ep) //out 0
 	usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
 	
 // 	printf("##%x %u %u\n", status, (uint16_t)(cnt_value - old_cnt_value), pkg_cnt);
+}
+
+static inline void sync_mcu_freq(uint16_t size, uint8_t time)
+{
+	
+	static uint32_t clks_total;
+	static uint32_t size_total;
+	if(audio_mem.mcu_sync_counter < 4000)
+	{
+		audio_mem.mcu_sync_counter++;
+		if(audio_mem.mcu_sync_counter < 512)
+		{
+			clks_total = 0;
+			size_total = 0;
+			return;
+		}
+
+		clks_total += time;
+		size_total += size;
+
+		if(audio_mem.mcu_sync_counter == 4000)
+		{
+			uint64_t frq = clks_total * 1024;
+			frq = frq * (uint64_t)audio_mem.sampleRate;
+			frq = frq / (uint64_t)(size_total >> 1);
+			usb_mem.callback.ep[AUDIO_STREAM_EPADDR].out = &audio_data_out0; //TODO: Dirty. Should be done by xmega_usb.c
+			usb_mem.callback.ep[AUDIO_STREAM_EPADDR].in = &audio_data_out1;
+			audio_mem.mcu_clock = frq;
+			audio_mem.teoriticalCLKsPerSample = (audio_mem.mcu_clock/audio_mem.sampleRate) - 1;
+			audio_mem.middleCLKsPerSample = 0;
+			uint16_t val = (((uint32_t)audio_mem.mcu_clock * 2) + 1000000UL*8)/(1000000UL*16) - 1; //TODO: Very dirty should be done somewhere but not here
+			USARTC0.BAUDCTRLA = val & 0xFF;
+			USARTC0.BAUDCTRLB = val >> 8; 
+			printf("cpu freq is: %lu %lu, %u\n", (uint32_t)frq, size_total, time);
+		}
+	}
+}
+
+void audio_data_out_sync_clk0(USB_EP_t *ep)
+{
+	uint16_t size = ep->CNT;
+	ep->CNT = 0;
+	usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
+
+	static uint16_t old_time = 0;
+	uint16_t new_time = AUDIO_TIME_COUNTER.CNT;
+	uint16_t time = new_time - old_time;
+
+	sync_mcu_freq(size, time);
+
+	old_time = new_time;
+}
+
+void audio_data_out_sync_clk1(USB_EP_t *ep)
+{
+	uint16_t size = ep->CNT;
+	ep->CNT = 0;
+	usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
+
+	static uint16_t old_time = 0;
+	uint16_t new_time = AUDIO_TIME_COUNTER.CNT;
+	uint16_t time = new_time - old_time;
+
+	sync_mcu_freq(size, time);
+
+	old_time = new_time;
 }
 
 void audio_init_dma(void)
@@ -246,6 +279,8 @@ void audio_init(void)
 		audio_mem.buffer[0].size = 0;
 	}
 	audio_mem.sampleRate = 48000;
+	audio_mem.mcu_synced = false;
+	audio_mem.mcu_clock = F_CPU;
 	audio_mem.teoriticalCLKsPerSample = (F_CPU/48000) - 1;
 	audio_reset();
 	AUDIO_TIME_COUNTER.CNT = 0;
@@ -427,9 +462,10 @@ void audio_reset(void)
 	audio_mem.middleCLKsPerSample = 0;
 	audio_mem._bank_in_work0 = 0;
 	audio_mem._bank_in_work1 = 1;
-	usb_mem.ep[AUDIO_STREAM_EPADDR].ep[0].DATAPTR = (uint16_t) audio_mem.buffer[0].audio_buffer;
-	usb_mem.ep[AUDIO_STREAM_EPADDR].ep[1].DATAPTR = (uint16_t) audio_mem.buffer[1].audio_buffer;
-	ep_config_isochronous(1, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out0, &audio_data_out1);
+	if(audio_mem.mcu_synced)
+		ep_config_isochronous(1, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out0, &audio_data_out1);
+	else
+		ep_config_isochronous(1, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out_sync_clk0, &audio_data_out_sync_clk1);
 	audio_init_dma();
 }
 
@@ -494,7 +530,8 @@ void audio_control_setSampleRate(USB_EP_t *ep)
 	{
 		audio_mem.sampleRate = (((uint32_t)usb_mem.ep0_out_buf[2] << 16) | ((uint32_t)usb_mem.ep0_out_buf[1] << 8) | (uint32_t)usb_mem.ep0_out_buf[0]);
 		usb_ep0_clear_setup();
-		audio_mem.teoriticalCLKsPerSample = (F_CPU/audio_mem.sampleRate) - 1;
+		audio_mem.teoriticalCLKsPerSample = (audio_mem.mcu_clock/audio_mem.sampleRate) - 1;
+
 		printf("sampleRate: %ld %d\n", audio_mem.sampleRate, audio_mem.teoriticalCLKsPerSample);
 		AUDIO_DMA_SAMPLE_TIMER.PERBUF = audio_mem.teoriticalCLKsPerSample;
 // 		usb_mem.ep[0].out.STATUS &= ~(/*USB_EP_TRNCOMPL0_bm |*/ USB_EP_BUSNACK0_bm | USB_EP_OVF_bm);
@@ -512,7 +549,10 @@ bool audio_setup_out(void)
 			{
 				if(usb_mem.setup_pkg.wValue) //Enable or disable
 				{
-					ep_config_isochronous(1, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out0, &audio_data_out1);
+						if(audio_mem.mcu_synced)
+							ep_config_isochronous(1, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out0, &audio_data_out1);
+						else
+							ep_config_isochronous(1, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out_sync_clk0, &audio_data_out_sync_clk1);
 					usb_mem.ep[1].out.STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
 // 					usb_mem.ep[1].in.STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
 					audio_mem.usb_stopped = false;

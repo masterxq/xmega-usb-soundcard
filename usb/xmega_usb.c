@@ -253,20 +253,24 @@ bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_s
 		callback_out = &empty_ep_func;
 		 
 	//Setup Out endpoint.
+	usb_mem.callback.ep[ep_num].in = callback_in;
+	usb_mem.callback.ep[ep_num].out = callback_out;
 	USB_EP_t *ep_ptr = &usb_mem.ep[ep_num].out;
+
 	ep_ptr->DATAPTR = (unsigned) buf0;
-	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_MULTIPKT_bm | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc;
+	ep_ptr->CNT = 0;
+	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_MULTIPKT_bm | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc; //Dont sure if pingpong is needed if isochronous
 // 	printf("CTRL: 0x%02X\n", ep_ptr->CTRL);
 	ep_ptr->STATUS = 0;
-	
+
 	//Setup In endpoint.
 	ep_ptr = &usb_mem.ep[ep_num].in;
 	ep_ptr->DATAPTR = (unsigned) buf1;
+	ep_ptr->CNT = 0;
 	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_MULTIPKT_bm | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc;
 	ep_ptr->STATUS = 0;
 
-	usb_mem.callback.ep[ep_num].in = callback_in;
-	usb_mem.callback.ep[ep_num].out = callback_out;
+
 	return true;
 }
 

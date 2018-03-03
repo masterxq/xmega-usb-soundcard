@@ -246,9 +246,9 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 			AUDIO_SAMPLE_FREQ(22050),
 			AUDIO_SAMPLE_FREQ(44100),
 			AUDIO_SAMPLE_FREQ(48000),
-			AUDIO_SAMPLE_FREQ(64000),
-			AUDIO_SAMPLE_FREQ(88200),
-			AUDIO_SAMPLE_FREQ(96000),
+// 			AUDIO_SAMPLE_FREQ(64000), //If you want to set this you need to change the size for the field in the descriptor.h from 5 to 8
+// 			AUDIO_SAMPLE_FREQ(88200),
+// 			AUDIO_SAMPLE_FREQ(96000),
 		},
 		
 		.Audio_StreamEndpoint =

@@ -19,7 +19,7 @@ typedef struct ConfigDesc {
 		USB_InterfaceDescriptor                Audio_StreamInterface_Alt1;
 			USB_Audio_Descriptor_Interface_AS_t       Audio_StreamInterface_SPC;
 			USB_Audio_Descriptor_Format_t             Audio_AudioFormat;
-			USB_Audio_SampleFreq_t                    Audio_AudioFormatSampleRates[8];
+			USB_Audio_SampleFreq_t                    Audio_AudioFormatSampleRates[5];
 			USB_Audio_Descriptor_StreamEndpoint_Std_t Audio_StreamEndpoint;
 			USB_Audio_Descriptor_StreamEndpoint_Spc_t Audio_StreamEndpoint_SPC;
 

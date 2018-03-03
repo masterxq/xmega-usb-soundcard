@@ -42,7 +42,7 @@ MCU = atxmega256a3u
 
 # Main Oscillator Frequency
 # This is only used to define F_CPU in all assembler and c-sources.
-F_CPU = 70272000UL
+F_CPU = 32000000UL
 F_USB = 48000000UL
 
 # Optimization level, can be [0, 1, 2, 3, s].

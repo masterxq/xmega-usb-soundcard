@@ -9,7 +9,7 @@
 #define AUDIO_BUFFER_INSTANCES 16 //min 4 next 8...
 #define AUDIO_BUFFER_INSTANCES_MASK 0b1111 //4 = 0b11, 8 = 0b111, 16 = 0b1111...
 #define AUDIO_WISHED_OFFSET 8
-#define AUDIO_STREAM_EPSIZE 512
+#define AUDIO_STREAM_EPSIZE 256
 
 #define AUDIO_DMA_SAMPLE_TIMER TCC0 //If this is changed evsys needs to be changed manually
 #define AUDIO_TIME_COUNTER TCD0
@@ -40,9 +40,11 @@ typedef struct audio_memory
 // 	uint16_t lastPlayedCompleteSampleNum;
 // 	uint16_t lastPlayedCompleteCLK;
 
+	bool mcu_synced;
+	uint32_t mcu_clock;
+	
 	uint32_t sampleRate;
 
-// 	uint16_t samplesBehind;
 	volatile uint16_t teoriticalCLKsPerSample;
 	volatile uint16_t middleCLKsPerSample;
 
@@ -72,7 +74,5 @@ extern void audio_start_dac_dma(void);
 extern void audio_work(void);
 
 extern void audio_init_dma(void);
-
-extern bool get_time32(uint32_t *time);
 
 #endif

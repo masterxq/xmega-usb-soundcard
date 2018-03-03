@@ -18,9 +18,11 @@
 
 int main(void)
 {
-	int2x_USB48(12);
+	//This clock is calibrated by the usb sof. The CPU clockrate is about 6 x (FIRST PARAMETER). The CPU per2 clockrate is about 12x (FIRST PARAMETER).
+// 	int2x_USB48(12);
 
-//   int48_ppl_USB48();
+	//This clock is independ from the usb bus. The CPU and per2 clk will be 2 x (FIRST PARAMETER).
+  int2x_ppl_USB48(16);
 
 	PORTCFG.CLKEVOUT = PORTCFG_CLKOUTSEL_CLK1X_gc | PORTCFG_CLKOUT_PC7_gc;
 	PORTC.DIRSET = PIN7_bm;

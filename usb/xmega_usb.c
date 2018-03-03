@@ -326,9 +326,10 @@ ISR(USB_TRNCOMPL_vect)
 	int8_t fifo_read_pos;
 	if(USB.INTFLAGSBCLR & USB_TRNIF_bm)
 	{
-		//The way the FIFO works is special. It is a fifo for all in and out eps.
-		//and stores every transaction complete.
-		//If all transactions are read the interrupt flag TRNIF will be cleared automatically.
+		/* The way the FIFO works is special. It is a fifo for all in and out eps.
+		 * and stores every transaction complete.
+		 * If all transactions are read the interrupt flag TRNIF will be cleared automatically.
+		 */
 		fifo_read_pos = USB.FIFORP; //If we read FIFORP it will automatically go to next pos.
 		
 		/*The endpoint that triggered the action need be read from

@@ -26,7 +26,7 @@ It is not possible to control the volume in hardware without additional external
 
 ## Instructions
 ### Clock
-The clockrate will be auto calibrated against the host. It will take some seconds before calibration is finished and the audio playback starts. I measure it on PORTC 7 set as CLK Output. Remember that the USB start of frame calibrates this clock.
+The clockrate will be auto calibrated against the host. It will take a few seconds before calibration is finished and the audio playback starts. I measure it on PORTC 7 set as CLK Output. Remember that the USB start of frame calibrates this clock.
 
 ### UART
 The UART C0 is configured to give some debug outputs at 1000000 baud. This can be used for debugging. The standard out is redirected to a buffer and the buffer will be printed in "idle" in the main loop. This is done, because else the output needs too much time in the interrupts. The main loop is not really idle, because we get the signed audio samples from the host. And every second byte needs to be touched to convert the data from signed into unsigned to make them compatible to the DAC. This is also done in main loop. So we do not have endless time there.

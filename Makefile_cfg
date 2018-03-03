@@ -1,0 +1,75 @@
+# Hey Emacs, this is a -*- makefile -*-
+#
+# WinAVR makefile written by Eric B. Weddington, J�rg Wunsch, et al.
+# Released to the Public Domain
+# Please read the make user manual!
+#
+# Additional material for this makefile was submitted by:
+#  Tim Henigan
+#  Peter Fleury
+#  Reiner Patommel
+#  Sander Pool
+#  Frederik Rouleau
+#  Markus Pfaff
+#
+# On command line:
+#
+# make all = Make software.
+#
+# make clean = Clean out built project files.
+#
+# make coff = Convert ELF to AVR COFF (for use with AVR Studio 3.x or VMLAB).
+#
+# make extcoff = Convert ELF to AVR Extended COFF (for use with AVR Studio
+#                4.07 or greater).
+#
+# make program = Download the hex file to the device, using avrdude.  Please
+#                customize the avrdude settings below first!
+#
+# make filename.s = Just compile filename.c into the assembler code only
+#
+# To rebuild project do "make clean" then "make all".
+#
+
+# mth 2004/09
+# Differences from WinAVR 20040720 sample:
+# - DEPFLAGS according to Eric Weddingtion's fix (avrfreaks/gcc-forum)
+# - F_CPU Define in CFLAGS and AFLAGS
+
+
+# MCU name
+MCU = atxmega256a3u
+
+# Main Oscillator Frequency
+# This is only used to define F_CPU in all assembler and c-sources.
+F_CPU = 70272000UL
+F_USB = 48000000UL
+
+# Optimization level, can be [0, 1, 2, 3, s].
+# 0 = turn off optimization. s = optimize for size.
+# (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
+OPT = 3
+
+# Q/QA Includes
+OSC             = 1
+USB_CDC         = 0
+UART            = 1
+COLOR_LCD       = 0
+COLOR_LCD_TOUCH = 0
+SYSTIME         = 0
+SDCARD          = 0
+LUFA            = 0
+RFM12_DRIVER    = 0
+FIFO            = 0
+NETWORK         = 0
+
+# Target file name (without extension).
+TARGET = main
+
+
+# List C source files here. The main target is automatically added. (C dependencies are automatically generated.)
+SRC = stdbuf.c usb/xmega_usb.c usb/usb_default_request.c usb/descriptor.c audio.c uart/uart.c osc/osc.c
+
+
+AVRDUDE_PORT = usb
+AVRDUDE_PROGRAMMER = avrisp2

@@ -1,0 +1,14 @@
+#ifndef __QA_UART_CFG_H_
+#define __QA_UART_CFG_H_ 1
+
+#define USARTC0_PROVIDED 1
+#define USARTC1_PROVIDED 1
+#define USARTD0_PROVIDED 1
+#define USARTD1_PROVIDED 1
+#define USARTE0_PROVIDED 1
+#define USARTE1_PROVIDED 1
+#define USARTF0_PROVIDED 1
+#define USARTF1_PROVIDED 1
+
+
+#endif

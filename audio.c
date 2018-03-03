@@ -161,6 +161,7 @@ static inline void sync_mcu_freq(uint16_t size, uint8_t time)
 			audio_mem.mcu_clock = frq;
 			audio_mem.teoriticalCLKsPerSample = (audio_mem.mcu_clock/audio_mem.sampleRate) - 1;
 			audio_mem.middleCLKsPerSample = 0;
+			audio_mem.mcu_synced = true;
 			uint16_t val = (((uint32_t)audio_mem.mcu_clock * 2) + 1000000UL*8)/(1000000UL*16) - 1; //TODO: Very dirty should be done somewhere but not here
 			USARTC0.BAUDCTRLA = val & 0xFF;
 			USARTC0.BAUDCTRLB = val >> 8; 

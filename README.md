@@ -10,6 +10,7 @@
 * Bitrates tested up to 96 KHz
 * FIFO-USB Stackcalls
 * Fully DMA support
+* Clock calibration on start
 * Clock calibration over time
 * Endpoint size for ISONCHRONOUS endpoints up to 1023 bytes
 * Acceptable sound Quality

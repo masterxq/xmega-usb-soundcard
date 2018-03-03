@@ -38,7 +38,7 @@
 
 
 # MCU name
-MCU = atxmega256a3u
+MCU ?= atxmega256a3u
 
 # Main Oscillator Frequency
 # This is only used to define F_CPU in all assembler and c-sources.

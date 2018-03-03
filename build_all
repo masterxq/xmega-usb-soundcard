@@ -1,0 +1,5 @@
+for i in atxmega128a3u atxmega256a3u atxmega192a3u atxmega128a4u atxmega256a3bu atxmega128a1u; do
+  make clean
+  make MCU=$i
+  cp main.hex 0.1.2_bins/$i.hex
+done

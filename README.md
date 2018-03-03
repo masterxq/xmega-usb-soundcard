@@ -39,6 +39,9 @@ If you want to try to use a Device with small internal SRAM (4 KB). You can try 
 ### Striped down to minimum
 For make it easy to use the includes i normaly use are striped down to a minimum from a large avr library i wrote. So if something looks unnessesary it possibly a remaining of the complete library. This means it is absolutely possible that it is really unnessesary for this use case.
 
+### build
+On linux the build of the Firmware should be done with make after installing the avr lib and compiler. It can be programmed with make program. If you write your own Makefile for it take attention the compiler flag -fno-jump-tables is sadly needed for some sections of the code. The audio controller is untestet on Windows. If you testes it drop me a message please.
+
 ## Thank you
 **Thanks to Dean and mojo-chun**
 
@@ -46,3 +49,6 @@ Audio descriptor token from [LUFA][LUFALink]. Inspiration, some headers and some
 
 [LUFALink]:http://www.fourwalledcubicle.com/LUFA.php
 [RNGLink]:https://github.com/kuro68k/xrng
+
+## Help needed
+I need a makefile for windows or whatever needed there. I need somebody who can test this on windows. If you like do that and if you like to share your work I would be very thankfully and share you it here for everybody.

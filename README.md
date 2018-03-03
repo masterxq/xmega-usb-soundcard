@@ -2,7 +2,7 @@
 
 ## Requirements
 * XMega µC with USB support
-* 8KB ram (Currently configured with big buffer so 16KB without changing the configuration)(Should be possible to get it work with 4KB for lower bitrates <=41 KHz)
+* 8KB ram (Currently configured with big buffer so 8KB without changing the configuration)(Should be possible to get it work with 4KB for lower bitrates <=41 KHz)
 * An amplifier for the DAC outputs. An standard OPAMP should do it for the start.
 
 ## Features
@@ -25,7 +25,7 @@ Its not possible to control the Volume in hardware without additionaly external 
 
 ## Instructions
 ### Clock
-The clockrate should be set in the Makefile_cfg. Set it so precise as possible. Because if it drift to hard, it can happen that you get buffer over and underflows before the clock can be corrected from the clock calibration, this dont need to be a problem but can be a problem. I measure it on PORTC 7 set as CLK Output. Remember the USB start of frame are calibrate this clock. So the device needs to be connected to USB for getting the correct clockrate.
+The clockrate will be auto calibrated against the host. It will take some seconds before calibration finished and the audio playback starts. I measure it on PORTC 7 set as CLK Output. Remember the USB start of frame are calibrate this clock.
 
 ### UART
 The UART C0 is configured to give some debug output at 1000000 baud. This is can be used for debugging. The standard out is redirected to a buffer and the buffer will be printed in "idle" in the main loop. This is done because else the output need to many time in interrupts. The main loop is not really idle. Because we get the signed audio samples from the host. And the every second byte needs to be touched for convert the data from signed into unsigned for making them compatible to the dac. This is also done in main loop. So we have not endless time there.

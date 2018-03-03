@@ -6,7 +6,7 @@
 
 #include <usb/usb_audio.h>
 #include <usb/usb_standard.h>
-#include "Q/Qdef_types.h"
+#include "Qdef_types.h"
 
 #include <avr/interrupt.h>
 

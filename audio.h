@@ -4,15 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <avr/io.h>
-
-#define AUDIO_STREAM_EPADDR   1
-#define AUDIO_BUFFER_INSTANCES 16 //min 4 next 8...
-#define AUDIO_BUFFER_INSTANCES_MASK 0b1111 //4 = 0b11, 8 = 0b111, 16 = 0b1111...
-#define AUDIO_WISHED_OFFSET 8
-#define AUDIO_STREAM_EPSIZE 256
-
-#define AUDIO_DMA_SAMPLE_TIMER TCC0 //If this is changed evsys needs to be changed manually
-#define AUDIO_TIME_COUNTER TCD0
+#include <cfg/usb_sound_cfg.h>
 
 // #define DEBUG_SYSTEM 1
 

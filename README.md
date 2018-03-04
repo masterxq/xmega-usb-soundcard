@@ -15,6 +15,7 @@
 * Endpoint size for ISONCHRONOUS endpoints up to 1023 bytes
 * Acceptable sound quality
 * Special and very fast implementation for the USB-Stack
+* Precompiled hex files provided
 
 ## Limitations
 
@@ -35,13 +36,18 @@ The UART C0 is configured to give some debug outputs at 1000000 baud. This can b
 As mentioned in [Uart](#uart) the data is converted in the main loop. If you want to use a soundcard with 96 KHz you possibly need to disable the outputs in the main loop. Else, the convertion of the sample can be too slow and we get a buffer underflow for the dac. These high sample rates are only tested with overclocking to 60 MHz or more. Maybe it also works with 32 MHz or 48 Mhz.
 
 ### Devices with low memory
-If you want to try to use a device with small internal SRAM (4 KB), you can try to disable all printf outputs or change them to print_p(PSTR("string")). The strings are in RAM permanently to assure improved processing speed. Settings about the buffer can be made directly in audio.h for very small buffers. Possibly, an adjustment of the audio.c necessary.
+If you want to try to use a device with small internal SRAM (4 KB), you can try to disable all printf outputs or change them to print_p(PSTR("string")). The strings are in RAM permanently to assure improved processing speed. Settings about the buffer can be made in usb_sound_cfh.h. For very small buffers. Possibly, an adjustment of the audio.c necessary.
 
 ### Stripped down too the minimum
 For make it easy to use, the includes i normaly use are stripped down to a minimum from a large avr library i wrote. So if something looks unnessesary it possibly a remnant of the complete library. It is absolutely possible that it is really unnessesary for this use case.
 
 ### build
 On linux, the build of the Firmware should be done with _make_ after installing the avr lib and compiler. It can be programmed with _make program_. If you write your own Makefile for it pay attention the compiler flag _-fno-jump-tables_. Is sadly needed for some sections of the code. The audio controller is untested on Windows. If you test it, drop me a message please.
+
+### Outputs
+*PORTC 7 is used for CPU CLK out.
+*PORTB 2+3 Stereo Out.
+*PORTC 2+3 USARTC0 RX,TX.
 
 ## Thank you
 **Thanks to Dean and mojo-chun**

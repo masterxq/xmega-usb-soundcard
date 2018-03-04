@@ -35,9 +35,11 @@ EXTRAINCDIRS =
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DDRV_MMC=0
+CDEFS += -DDRV_MMC=0
 
-
+ifdef MULTIPLIER
+  CDEFS += -DMULTIPLIER=$(MULTIPLIER)
+endif
 
 # Place -I options here
 CINCS =

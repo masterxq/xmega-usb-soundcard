@@ -123,8 +123,6 @@ bool usb_handle_setup(void){
 	}
 	
 // 	printf_P(PSTR("cb\n"));
-	if(usb_cb_control_setup())
-		return true;
 	if(usb_mem.unhandled_setup_out())
 		return true;
 	return false;

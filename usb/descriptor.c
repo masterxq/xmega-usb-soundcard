@@ -301,88 +301,6 @@ const PROGMEM USB_StringDescriptor product_string = {
 
 
 
-
-
-const PROGMEM USB_StringDescriptor msft_string = {
-	.bLength = 18,
-	.bDescriptorType = USB_DTYPE_String,
-	.bString = u"MSFT100" WCID_REQUEST_ID_STR
-};
-
-
-__attribute__((__aligned__(4))) const USB_MicrosoftCompatibleDescriptor msft_compatible = {
-	.dwLength = sizeof(USB_MicrosoftCompatibleDescriptor) +
-				1*sizeof(USB_MicrosoftCompatibleDescriptor_Interface),
-	.bcdVersion = 0x0100,
-	.wIndex = 0x0004,
-	.bCount = 1,
-	.reserved = {0, 0, 0, 0, 0, 0, 0},
-	.interfaces = {
-		{
-			.bFirstInterfaceNumber = 0,
-			.reserved1 = 0x01,
-			.compatibleID = "WINUSB\0\0",
-			.subCompatibleID = {0, 0, 0, 0, 0, 0, 0, 0},
-			.reserved2 = {0, 0, 0, 0, 0, 0},
-		},
-	}
-};
-
-__attribute__((__aligned__(4))) const USB_MicrosoftExtendedPropertiesDescriptor msft_extended = {
-	.dwLength = sizeof(USB_MicrosoftExtendedPropertiesDescriptor),
-	.bcdVersion = 0x0100,
-	.wIndex = 0x0005,
-	.wCount = 2,
-
-	.dwPropLength = 132,
-	.dwType = 1,
-	.wNameLength = 40,
-	.name = L"DeviceInterfaceGUID\0",
-	.dwDataLength = 78,
-	.data = L"{d1ef5aba-506a-4ec6-94af-280f9ead82d5}\0",
-
-	.dwPropLength2 = 14 + (6*2) + (5*2),
-	.dwType2 = 1,
-	.wNameLength2 = 6*2,
-	.name2 = L"Label\0",
-	.dwDataLength2 = 5*2,
-	.data2 = L"XRNG\0",
-};
-
-
-/*
-__attribute__((__aligned__(4))) const USB_MicrosoftExtendedPropertiesDescriptor msft_extended = {
-	.dwLength = sizeof(USB_MicrosoftExtendedPropertiesDescriptor),
-	.dwLength = 142,
-	.bcdVersion = 0x0100,
-	.wIndex = 0x0005,
-	.wCount = 1,
-	.dwPropLength = 132,
-	.dwType = 1,
-	.wNameLength = 40,
-	.name = L"DeviceInterfaceGUID\0",
-	.dwDataLength = 78,
-	.data = L"{42314231-5A81-49F0-BC3D-A4FF138216D7}\0",
-};
-*/
-/*
-__attribute__((__aligned__(4))) const USB_MicrosoftExtendedPropertiesDescriptor msft_extended = {
-	.dwLength = sizeof(USB_MicrosoftExtendedPropertiesDescriptor),
-	.dwLength = 146,
-	.bcdVersion = 0x0100,
-	.wIndex = 0x0005,
-	.wCount = 1,
-	.dwPropLength = 136,
-	.dwType = 7,
-	.wNameLength = 42,
-	.name = L"DeviceInterfaceGUIDs\0",
-	.dwDataLength = 80,
-	.data = L"{42314231-5A81-49F0-BC3D-A4FF138216D7}\0\0",
-};
-*/
-
-
-
 uint16_t usb_cb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr) {
 	const void* address = NULL;
 	uint16_t size    = 0;
@@ -406,9 +324,6 @@ uint16_t usb_cb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr)
 					break;
 				case 0x02:
 					address = &product_string;
-					break;
-				case 0xEE:
-					address = &msft_string;
 					break;
 			}
 			size = pgm_read_byte(&((USB_StringDescriptor*)address)->bLength);
@@ -438,43 +353,6 @@ void usb_cb_completion(void) {
 }
 
 
-
-bool handle_msft_compatible(void) {
-	const uint8_t *data;
-	uint16_t len;
-	if (usb_mem.setup_pkg.wIndex == 0x0005) {
-		len = msft_extended.dwLength;
-		data = (const uint8_t *)&msft_extended;
-	} else if (usb_mem.setup_pkg.wIndex == 0x0004) {
-		len = msft_compatible.dwLength;
-		data = (const uint8_t *)&msft_compatible;
-	} else {
-		return false;
-	}
-	if (len > usb_mem.setup_pkg.wLength) {
-		len = usb_mem.setup_pkg.wLength;
-	}
-	memcpy(usb_mem.ep0_in_buf, data, len);
-	usb_ep0_in(len);
-	usb_ep0_out();
-	return true;
-}
-
-bool usb_cb_control_setup(void) {
-	uint8_t recipient = usb_mem.setup_pkg.bmRequestType & USB_REQTYPE_RECIPIENT_MASK;
-	if (recipient == USB_RECIPIENT_DEVICE) {
-		switch(usb_mem.setup_pkg.bRequest) {
-			case WCID_REQUEST_ID:
-				return handle_msft_compatible();
-		}
-	} else if (recipient == USB_RECIPIENT_INTERFACE) {
-		switch(usb_mem.setup_pkg.bRequest) {
-			case WCID_REQUEST_ID:
-				return handle_msft_compatible();
-		}
-	}
-	return false;
-}
 
 void usb_cb_control_in_completion(void) {
 

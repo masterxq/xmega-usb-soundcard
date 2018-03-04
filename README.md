@@ -45,9 +45,9 @@ For make it easy to use, the includes i normaly use are stripped down to a minim
 On linux, the build of the Firmware should be done with _make_ after installing the avr lib and compiler. It can be programmed with _make program_. If you write your own Makefile for it pay attention the compiler flag _-fno-jump-tables_. Is sadly needed for some sections of the code. The audio controller is untested on Windows. If you test it, drop me a message please.
 
 ### Outputs
-*PORTC 7 is used for CPU CLK out.
-*PORTB 2+3 Stereo Out.
-*PORTC 2+3 USARTC0 RX,TX.
+* PORTC 7 is used for CPU CLK out.
+* PORTB 2+3 Stereo Out.
+* PORTC 2+3 USARTC0 RX,TX.
 
 ## Thank you
 **Thanks to Dean and mojo-chun**

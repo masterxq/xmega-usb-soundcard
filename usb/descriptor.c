@@ -8,86 +8,6 @@
 
 #include <string.h>
 
-
-// Notes:
-// Fill in VID/PID in device_descriptor
-// Fill in msft_extended for WCID
-// WCID request ID can be changed below
-// Other options in usb.h
-// Additional compiler flags: -std=gnu99 -fno-strict-aliasing -Wstrict-prototypes -fno-jump-tables
-
-#define WCID_REQUEST_ID			0x22
-#define WCID_REQUEST_ID_STR		u"\x22"
-
-// const USB_DeviceDescriptor PROGMEM device_descriptor = {
-// 	.bLength = sizeof(USB_DeviceDescriptor),
-// 	.bDescriptorType = USB_DTYPE_Device,
-// 
-// 	.bcdUSB                 = 0x0200,
-// 	.bDeviceClass           = USB_CSCP_VendorSpecificClass,
-// 	.bDeviceSubClass        = USB_CSCP_NoDeviceSubclass,
-// 	.bDeviceProtocol        = USB_CSCP_NoDeviceProtocol,
-// 
-// 	.bMaxPacketSize0        = 64,
-// 	.idVendor               = 0x8282,
-// 	.idProduct              = 0x9999,
-// 	.bcdDevice              = 0x0100,
-// 
-// 	.iManufacturer          = 0x01,
-// 	.iProduct               = 0x02,
-// 	.iSerialNumber          = 0,
-// 
-// 	.bNumConfigurations     = 1
-// };
-// 
-// typedef struct ConfigDesc {
-// 	USB_ConfigurationDescriptor Config;
-// 	USB_InterfaceDescriptor Interface0;
-// 	USB_EndpointDescriptor DataInEndpoint;
-// 	USB_EndpointDescriptor DataOutEndpoint;
-// 
-// } ConfigDesc;
-// 
-// const PROGMEM ConfigDesc configuration_descriptor = {
-// 	.Config = {
-// 		.bLength = sizeof(USB_ConfigurationDescriptor),
-// 		.bDescriptorType = USB_DTYPE_Configuration,
-// 		.wTotalLength  = sizeof(ConfigDesc),
-// 		.bNumInterfaces = 1,
-// 		.bConfigurationValue = 1,
-// 		.iConfiguration = 0,
-// 		.bmAttributes = USB_CONFIG_ATTR_RESERVED,
-// 		.bMaxPower = USB_CONFIG_POWER_MA(500)
-// 	},
-// 	.Interface0 = {
-// 		.bLength = sizeof(USB_InterfaceDescriptor),
-// 		.bDescriptorType = USB_DTYPE_Interface,
-// 		.bInterfaceNumber = 0,
-// 		.bAlternateSetting = 0,
-// 		.bNumEndpoints = 2,
-// 		.bInterfaceClass = USB_CSCP_VendorSpecificClass,
-// 		.bInterfaceSubClass = 0x00,
-// 		.bInterfaceProtocol = 0x00,
-// 		.iInterface = 0
-// 	},
-// 	.DataInEndpoint = {
-// 		.bLength = sizeof(USB_EndpointDescriptor),
-// 		.bDescriptorType = USB_DTYPE_Endpoint,
-// 		.bEndpointAddress = 0x81,
-// 		.bmAttributes = (USB_EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-// 		.wMaxPacketSize = 64,
-// 		.bInterval = 0x00
-// 	},
-// 	.DataOutEndpoint = {
-// 		.bLength = sizeof(USB_EndpointDescriptor),
-// 		.bDescriptorType = USB_DTYPE_Endpoint,
-// 		.bEndpointAddress = 0x2,
-// 		.bmAttributes = (USB_EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-// 		.wMaxPacketSize = 64,
-// 		.bInterval = 0x00
-// 	},
-// };
-
 const USB_DeviceDescriptor PROGMEM device_descriptor = {
 	.bLength = sizeof(USB_DeviceDescriptor),
 	.bDescriptorType = USB_DTYPE_Device,
@@ -108,10 +28,6 @@ const USB_DeviceDescriptor PROGMEM device_descriptor = {
 
 	.bNumConfigurations     = 1
 };
-
-// #ifndef F_USB
-// #define __flash
-// #endif
 
 
 

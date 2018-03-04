@@ -62,7 +62,8 @@ bool usb_handle_setup(void){
 				const uint8_t* descriptor = 0;
 				uint16_t size = usb_cb_get_descriptor(type, index, &descriptor);
 
-				if (size && descriptor){
+				if (size && descriptor)
+				{
 					if (size > usb_mem.setup_pkg.wLength)
 					{
 						size = usb_mem.setup_pkg.wLength;
@@ -72,8 +73,9 @@ bool usb_handle_setup(void){
 					{
 						memcpy(usb_mem.ep0_in_buf, descriptor, size);
 					}
-					usb_ep0_clear_setup();
 					usb_ep0_in(size);
+					usb_ep0_clear_setup();
+					
 					
 
 					if(size > sizeof(usb_mem.ep0_in_buf))

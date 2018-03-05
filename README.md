@@ -42,7 +42,7 @@ If you want to try to use a device with small internal SRAM (4 KB), you can try 
 For make it easy to use, the includes i normaly use are stripped down to a minimum from a large avr library i wrote. So if something looks unnessesary it possibly a remnant of the complete library. It is absolutely possible that it is really unnessesary for this use case.
 
 ### build
-On linux, the build of the Firmware should be done with _make_ after installing the avr lib and compiler. It can be programmed with _make program_. If you write your own Makefile for it pay attention the compiler flag _-fno-jump-tables_. Is sadly needed for some sections of the code. The audio controller is untested on Windows. If you test it, drop me a message please.
+On linux, the build of the Firmware should be done with _make_ after installing the avr lib and compiler. It can be programmed with _make program_. If you write your own Makefile for it pay attention the compiler flag _-fno-jump-tables_. Is sadly needed for some sections of the code.
 
 ### Outputs
 * PORTC 7 is used for CPU CLK out.

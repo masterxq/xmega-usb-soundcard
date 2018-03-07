@@ -60,7 +60,7 @@ bool usb_handle_setup(void){
 				uint8_t type = (usb_mem.setup_pkg.wValue >> 8);
 				uint8_t index = (usb_mem.setup_pkg.wValue & 0xFF);
 				const uint8_t* descriptor = 0;
-				uint16_t size = usb_cb_get_descriptor(type, index, &descriptor);
+				uint16_t size = usb_get_descriptor(type, index, &descriptor);
 
 				if (size && descriptor)
 				{

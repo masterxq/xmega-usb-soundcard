@@ -217,7 +217,7 @@ const PROGMEM USB_StringDescriptor product_string = {
 
 
 
-uint16_t usb_cb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr) {
+uint16_t usb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr) {
 	const void* address = NULL;
 	uint16_t size    = 0;
 
@@ -252,9 +252,6 @@ uint16_t usb_cb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr)
 	return size;
 }
 
-void usb_cb_reset(void) {
-
-}
 
 bool usb_cb_set_configuration(uint8_t config) {
 	if (config <= 1) {
@@ -262,20 +259,6 @@ bool usb_cb_set_configuration(uint8_t config) {
 	} else {
 		return false;
 	}
-}
-
-void usb_cb_completion(void) {
-
-}
-
-
-
-void usb_cb_control_in_completion(void) {
-
-}
-
-void usb_cb_control_out_completion(void) {
-
 }
 
 bool usb_cb_set_interface(uint16_t __attribute__((unused)) interface, uint16_t __attribute__((unused)) altsetting) {

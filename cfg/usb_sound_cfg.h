@@ -5,7 +5,7 @@
 #define AUDIO_STREAM_EPADDR   1            //For this application it should stay 1
 #define AUDIO_BUFFER_INSTANCES 16          //min 4 next 8... The needed buffersize is AUDIO_BUFFER_INSTANCES * AUDIO_STREAM_EPSIZE
 #define AUDIO_BUFFER_INSTANCES_MASK 0b1111 //4 = 0b11, 8 = 0b111, 16 = 0b1111... It will be used instead of modulo (%)
-#define AUDIO_WISHED_OFFSET 8              /* The software will try to output the buffer with an offset of 8. 
+#define AUDIO_WISHED_OFFSET 7              /* The software will try to output the buffer with an offset of 8. 
                                             * If buffer 2 just received buffer 10 will be put on the dac.
                                             * To avoid over and underflows this this allways be something
                                             * like AUDIO_BUFFER_INSTANCES/2.

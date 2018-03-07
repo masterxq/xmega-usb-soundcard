@@ -35,9 +35,6 @@ enum InterfaceDescriptors_t
 
 extern const PROGMEM ConfigDesc configuration_descriptor;
 
-extern bool usb_cb_control_setup(void);
+extern uint16_t usb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr);
 
-extern uint16_t usb_cb_get_descriptor(uint8_t type, uint8_t index, const uint8_t** ptr);
-extern bool usb_cb_set_configuration(uint8_t config);
-extern bool usb_cb_set_interface(uint16_t interface, uint16_t altsetting);
 #endif

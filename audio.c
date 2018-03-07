@@ -150,7 +150,7 @@ static inline void sync_mcu_freq(uint16_t size, uint8_t time)
 
 		clks_total += time;
 		size_total += size;
-
+		printf("cps:%d %d\n", time, size);
 		if(audio_mem.mcu_sync_counter == 4000)
 		{
 			uint64_t frq = clks_total * 1024;
@@ -315,7 +315,7 @@ static inline void dma_setup_channel(DMA_CH_t *channel, uint8_t buf_num)
 	if(!audio_mem.middleCLKsPerSample)
 	{
 		audio_mem.middleCLKsPerSample = audio_mem.teoriticalCLKsPerSample;
-		linear = 13;
+		linear = 40;
 		measureas = 2048;
 		m_sum = 0;
 		m_count = 0;
@@ -352,12 +352,12 @@ static inline void dma_setup_channel(DMA_CH_t *channel, uint8_t buf_num)
 // 	printf("extreme %d\n", from_idle);
 	if(from_idle < -3)
 	{
-		clks = clks + (from_idle + 5) * 15;
+// 		clks = clks + (from_idle + 2) * 15;
 // 		printf("cmp%d%d:%d\n", audio_mem.last_completed_bank, audio_mem.last_converted_bank, audio_mem.last_free_bank);
 	}
 	if(from_idle > 3)
 	{
-		clks = clks + (from_idle - 5) * 15;
+// 		clks = clks + (from_idle - 2) * 15;
 // 		printf("extreme %d\n", from_idle);
 	}
 

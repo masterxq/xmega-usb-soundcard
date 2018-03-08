@@ -394,8 +394,8 @@ ISR(USB_BUSEVENT_vect){
 	else
 	{
 		USB.INTFLAGSACLR = USB_SUSPENDIF_bm | USB_RESUMEIF_bm | USB_RSTIF_bm;
-		if (USB.STATUS & USB_BUSRST_bm){
-			USB.STATUS &= ~USB_BUSRST_bm;
+		if (USB.STATUS & USB_RSTIF_bm){
+			USB.STATUS &= ~USB_RSTIF_bm;
 			usb_reset();
 			printf_P(PSTR("Performed reset\n"));
 		}

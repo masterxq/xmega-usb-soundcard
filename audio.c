@@ -203,17 +203,20 @@ void audio_data_out_sync_clk1(USB_EP_t *ep)
 void audio_init_dma(void)
 {
 	EVSYS.CH0MUX                     = EVSYS_CHMUX_TCC0_OVF_gc; //Route Timer through eventcontroller for clearing timer interrupt
+	EVSYS.CH1MUX                     = EVSYS_CHMUX_TCC0_CCA_gc;
 	EVSYS.CH0CTRL                    = 0;
+	EVSYS.CH1CTRL                    = 0;
 
 	DACB.CTRLA = DAC_CH0EN_bm | DAC_CH1EN_bm;
 	DACB.CTRLB = DAC_CHSEL_DUAL_gc;
 	DACB.CTRLC = DAC_REFSEL_INT1V_gc | DAC_LEFTADJ_bm;
 	DACB.CTRLA |= DAC_ENABLE_bm;
-	DACB.EVCTRL = DAC_EVSEL0_bm;
+	DACB.EVCTRL = DAC_EVSEL1_bm;
 	
 	AUDIO_DMA_SAMPLE_TIMER.CTRLA = TC_CLKSEL_DIV1_gc;
 	AUDIO_DMA_SAMPLE_TIMER.CNT = 0;
 	AUDIO_DMA_SAMPLE_TIMER.PER = 3000;       //Timerlimit
+	AUDIO_DMA_SAMPLE_TIMER.CCA = 100;
 	AUDIO_DMA_SAMPLE_TIMER.INTCTRLA = TC_OVFINTLVL_OFF_gc;
 	AUDIO_DMA_SAMPLE_TIMER.CTRLB = TC_WGMODE_NORMAL_gc;
 	

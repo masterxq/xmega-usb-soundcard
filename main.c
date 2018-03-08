@@ -32,8 +32,8 @@ int main(void)
 	//This clock is independ from the usb bus. The CPU and per2 clk will be 2 x (FIRST PARAMETER).
   int2x_ppl_USB48(16);
 #endif
-	PORTCFG.CLKEVOUT = PORTCFG_CLKOUTSEL_CLK1X_gc | PORTCFG_CLKOUT_PC7_gc;
-	PORTC.DIRSET = PIN7_bm;
+// 	PORTCFG.CLKEVOUT = PORTCFG_CLKOUTSEL_CLK1X_gc | PORTCFG_CLKOUT_PC7_gc;
+// 	PORTC.DIRSET = PIN7_bm;
 	_delay_ms(800);
 	uart_init(&USARTC0, UART_BAUD, USART_RXCINTLVL_OFF_gc, NULL, false, true);
 

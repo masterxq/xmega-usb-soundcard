@@ -13,7 +13,7 @@
 * Clock calibration on start
 * Clock calibration over time
 * Endpoint size for ISONCHRONOUS endpoints up to 1023 bytes
-* Acceptable sound quality
+* Good sound quality
 * Special and very fast implementation for the USB-Stack
 * Precompiled hex files provided
 

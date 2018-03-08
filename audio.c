@@ -218,7 +218,8 @@ void audio_init_dma(void)
 	AUDIO_DMA_SAMPLE_TIMER.CTRLB = TC_WGMODE_NORMAL_gc;
 	
 	uint16_u target;
-	target.u16 = ((uint16_t) &DACB.CH1DATA) + 1;
+	target.u16 = ((uint16_t) &DACB.CH0DATA);
+// 	target.u16 = ((uint16_t) ((uint8_t *)&targetbuf[1]) + 1);
 
 	DMA.CTRL = DMA_ENABLE_bm | DMA_DBUFMODE_CH01_gc;
 
@@ -266,8 +267,8 @@ void audio_init_dma(void)
 	DMA.CH1.TRFCNT                   = 64;
 	DMA.CH1.REPCNT                   = 0;
 
-	DMA.CH0.ADDRCTRL                 = DMA_CH_SRCRELOAD_TRANSACTION_gc | DMA_CH_SRCDIR_INC_gc | DMA_CH_DESTRELOAD_BURST_gc | DMA_CH_DESTDIR_DEC_gc;
-	DMA.CH1.ADDRCTRL                 = DMA_CH_SRCRELOAD_TRANSACTION_gc | DMA_CH_SRCDIR_INC_gc | DMA_CH_DESTRELOAD_BURST_gc | DMA_CH_DESTDIR_DEC_gc;
+	DMA.CH0.ADDRCTRL                 = DMA_CH_SRCRELOAD_TRANSACTION_gc | DMA_CH_SRCDIR_INC_gc | DMA_CH_DESTRELOAD_BURST_gc | DMA_CH_DESTDIR_INC_gc;
+	DMA.CH1.ADDRCTRL                 = DMA_CH_SRCRELOAD_TRANSACTION_gc | DMA_CH_SRCDIR_INC_gc | DMA_CH_DESTRELOAD_BURST_gc | DMA_CH_DESTDIR_INC_gc;
 	
 // 	DMA.CH0.CTRLA                   |= DMA_CH_ENABLE_bm;
 }
@@ -364,6 +365,10 @@ static inline void dma_setup_channel(DMA_CH_t *channel, uint8_t buf_num)
 	AUDIO_DMA_SAMPLE_TIMER.PERBUF = clks;
 	m_count++;
 	m_sum += clks;
+// 	static uint8_t i = 0;
+// 	if(audio_mem.buffer[0].audio_buffer[1] != 0x00 && audio_mem.buffer[0].audio_buffer[1] != 0xFF)
+// 		printf("%X %X\n", DACB.CH0DATA, DACB.CH1DATA);
+// 	i++;
 	if(m_count == measureas)
 	{
 		audio_mem.middleCLKsPerSample = m_sum / measureas;
@@ -389,68 +394,68 @@ static inline void dma_setup_channel(DMA_CH_t *channel, uint8_t buf_num)
 
 
 
-static inline void dma_check_ready(void)
-{
-	if(DMA.CH0.CTRLB & DMA_CH_TRNIF_bm) //The channel has made his work
-	{
-		if(((audio_mem.last_converted_bank - audio_mem.last_free_bank) & AUDIO_BUFFER_INSTANCES_MASK) <= 2) //If we have 2 or less buffers ready we can not continue, because all ready buffers are in work.
-		{
-#ifdef DEBUG_SYSTEM
-			printf("dma nr\n");
-#endif
-			return; //we can return the error case that both buffers are ready will be handled in the next iteration.
-		}
-		//We can prepare the buffer
-		dma_setup_channel(&DMA.CH0, (audio_mem.last_free_bank + 3) & AUDIO_BUFFER_INSTANCES_MASK);
-		if(DMA.CH1.CTRLB & DMA_CH_TRNIF_bm)//When both channels are ready we possibly had an underflow and will disable the dma.
-		{
-			printf("dma uf\n");
-			//No matter let us clear the 2 completed buffers so we and clear the memory.
-			audio_mem.last_free_bank += 2;
-			DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm; //Clear the flags
-			DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
-			DMA.CH0.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
-			DMA.CH1.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
-			return;
-		}
-		
-		//Free the complete buffer
-		audio_mem.last_free_bank = (audio_mem.last_free_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK;
-#ifdef DEBUG_SYSTEM
-		printf("dma0: %d\n", audio_mem.last_free_bank);
-#endif
-	}
-	
-	if(DMA.CH1.CTRLB & DMA_CH_TRNIF_bm)
-	{
-		if(((audio_mem.last_converted_bank - audio_mem.last_free_bank) & AUDIO_BUFFER_INSTANCES_MASK) <= 2) //If we have 2 or less buffers ready we can not continue, because all ready buffers are in work.
-		{
-#ifdef DEBUG_SYSTEM
-			printf("dma nr\n");
-#endif
-			return; //we can return the error case that both buffers are ready will be handled in the next iteration. Or we can continue here next time.
-		}
-		//We can prepare the buffer
-		dma_setup_channel(&DMA.CH1, (audio_mem.last_free_bank + 3) & AUDIO_BUFFER_INSTANCES_MASK);
-		if(DMA.CH0.CTRLB & DMA_CH_TRNIF_bm)//When both channels are ready we possibly had an underflow and will disable the dma.
-		{
-			printf("dma uf\n");
-			//No matter let us clear the 2 completed buffers so we and clear the memory.
-			audio_mem.last_free_bank += 2;
-			DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm; //Clear the flags
-			DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
-			DMA.CH0.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
-			DMA.CH1.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
-			return;
-		}
-		//Free the complete buffer
-		audio_mem.last_free_bank = (audio_mem.last_free_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK;
-#ifdef DEBUG_SYSTEM
-		printf("dma1: %d\n", audio_mem.last_free_bank);
-#endif
-		DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
-	}
-}
+// static inline void dma_check_ready(void)
+// {
+// 	if(DMA.CH0.CTRLB & DMA_CH_TRNIF_bm) //The channel has made his work
+// 	{
+// 		if(((audio_mem.last_converted_bank - audio_mem.last_free_bank) & AUDIO_BUFFER_INSTANCES_MASK) <= 2) //If we have 2 or less buffers ready we can not continue, because all ready buffers are in work.
+// 		{
+// #ifdef DEBUG_SYSTEM
+// 			printf("dma nr\n");
+// #endif
+// 			return; //we can return the error case that both buffers are ready will be handled in the next iteration.
+// 		}
+// 		//We can prepare the buffer
+// 		dma_setup_channel(&DMA.CH0, (audio_mem.last_free_bank + 3) & AUDIO_BUFFER_INSTANCES_MASK);
+// 		if(DMA.CH1.CTRLB & DMA_CH_TRNIF_bm)//When both channels are ready we possibly had an underflow and will disable the dma.
+// 		{
+// 			printf("dma uf\n");
+// 			//No matter let us clear the 2 completed buffers so we and clear the memory.
+// 			audio_mem.last_free_bank += 2;
+// 			DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm; //Clear the flags
+// 			DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
+// 			DMA.CH0.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
+// 			DMA.CH1.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
+// 			return;
+// 		}
+// 		
+// 		//Free the complete buffer
+// 		audio_mem.last_free_bank = (audio_mem.last_free_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK;
+// #ifdef DEBUG_SYSTEM
+// 		printf("dma0: %d\n", audio_mem.last_free_bank);
+// #endif
+// 	}
+// 	
+// 	if(DMA.CH1.CTRLB & DMA_CH_TRNIF_bm)
+// 	{
+// 		if(((audio_mem.last_converted_bank - audio_mem.last_free_bank) & AUDIO_BUFFER_INSTANCES_MASK) <= 2) //If we have 2 or less buffers ready we can not continue, because all ready buffers are in work.
+// 		{
+// #ifdef DEBUG_SYSTEM
+// 			printf("dma nr\n");
+// #endif
+// 			return; //we can return the error case that both buffers are ready will be handled in the next iteration. Or we can continue here next time.
+// 		}
+// 		//We can prepare the buffer
+// 		dma_setup_channel(&DMA.CH1, (audio_mem.last_free_bank + 3) & AUDIO_BUFFER_INSTANCES_MASK);
+// 		if(DMA.CH0.CTRLB & DMA_CH_TRNIF_bm)//When both channels are ready we possibly had an underflow and will disable the dma.
+// 		{
+// 			printf("dma uf\n");
+// 			//No matter let us clear the 2 completed buffers so we and clear the memory.
+// 			audio_mem.last_free_bank += 2;
+// 			DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm; //Clear the flags
+// 			DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
+// 			DMA.CH0.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
+// 			DMA.CH1.CTRLA &= ~DMA_CH_ENABLE_bm; //Disable dma
+// 			return;
+// 		}
+// 		//Free the complete buffer
+// 		audio_mem.last_free_bank = (audio_mem.last_free_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK;
+// #ifdef DEBUG_SYSTEM
+// 		printf("dma1: %d\n", audio_mem.last_free_bank);
+// #endif
+// 		DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
+// 	}
+// }
 
 void audio_reset(void)
 {
@@ -496,7 +501,7 @@ void audio_work(void)
 			uint8_t next_bank = (audio_mem.last_converted_bank + 1) & AUDIO_BUFFER_INSTANCES_MASK;
 			audio_buffer_t *buf_ptr = &audio_mem.buffer[next_bank];
 
-			for(uint16_t i = 0; i < buf_ptr->size; i+=2)
+			for(uint16_t i = 1; i <= buf_ptr->size; i+=2)
 			{
 				buf_ptr->audio_buffer[i] ^= (1 << 7);
 // 				buf_ptr->audio_buffer[i] = buf_ptr->audio_buffer[i + 1];

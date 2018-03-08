@@ -11,6 +11,8 @@
 *.lnk
 *.lss
 *.eep
+*.ods
+*.ods#
 gitdoyourstuff
 build_all
 bin

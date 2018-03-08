@@ -20,7 +20,7 @@
 ## Limitations
 
 ### 12bit DAC Sample cut
-The xmega has a 12bit DAC Only and we get 16bit data from the host. It is configured to ignore the 4 lsb. So if the signal is very quiet you will not hear anything.
+The xmega has a 12bit DAC Only and we get 16bit data from the host. It is configured to ignore the 4 lsb.
 
 ### No hardware Volume control
 It is not possible to control the volume in hardware without additional external components. So if the audio volume is lowered we will lose resolution on the DAC.

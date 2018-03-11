@@ -18,3 +18,4 @@ build_all
 bin
 .kdev4
 xmega_usb_sound_card.kdev4
+helper

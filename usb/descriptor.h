@@ -16,6 +16,8 @@ typedef struct ConfigDesc {
 			uint8_t interfaceList[2];
 			USB_Audio_Descriptor_InputTerminal_t Audio_InputTerminal;
 			USB_Audio_Descriptor_OutputTerminal_t Audio_OutputTerminal;
+			USB_Audio_Descriptor_InputTerminal_t Audio_InputTerminal2;
+			USB_Audio_Descriptor_OutputTerminal_t Audio_OutputTerminal2;
 		//Speakers
 		USB_InterfaceDescriptor                Audio_StreamInterface_Alt0;
 		USB_InterfaceDescriptor                Audio_StreamInterface_Alt1;

@@ -27,7 +27,7 @@ void audio_init()
 	audio_mem.mcu_clock = F_CPU;
 	audio_mem.mcu_synced = false;
 
-// 	audio_mic_init();
+	audio_mic_init();
 	audio_mem.speaker_sampleRate = 48000;
 	audio_mem.speaker_teoriticalCLKsPerSample = (F_CPU/48000) - 1;
 

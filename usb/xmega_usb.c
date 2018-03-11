@@ -240,6 +240,7 @@ bool ep_config(uint8_t ep_num, void* in_buf, void* out_buf, USB_EP_TYPE_t ep_typ
 
 bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_size, ep_callback_action callback_out, ep_callback_action callback_in)
 {
+
 	ep_num &= ~(1 << 7);
 	if(ep_num >= NUM_EP)
 	{
@@ -260,7 +261,8 @@ bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_s
 
 	ep_ptr->DATAPTR = (unsigned) buf0;
 	ep_ptr->CNT = 0;
-	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_MULTIPKT_bm | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc; //Dont sure if pingpong is needed if isochronous
+	ep_ptr->AUXDATA = 0;
+	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc; //Dont sure if pingpong is needed if isochronous
 // 	printf("CTRL: 0x%02X\n", ep_ptr->CTRL);
 	ep_ptr->STATUS = 0;
 
@@ -268,7 +270,8 @@ bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_s
 	ep_ptr = &usb_mem.ep[ep_num].in;
 	ep_ptr->DATAPTR = (unsigned) buf1;
 	ep_ptr->CNT = 0;
-	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_MULTIPKT_bm | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc;
+	ep_ptr->AUXDATA = 0;
+	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc;
 	ep_ptr->STATUS = 0;
 
 
@@ -318,10 +321,11 @@ const uint8_t* usb_ep0_from_progmem(const uint8_t* addr, uint16_t size) {
 
 
 
-
+#include <cfg/usb_sound_cfg.h>
 
 ISR(USB_TRNCOMPL_vect)
 {
+// 		printf("%x", usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].STATUS & (USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm));
 // 	printf("irq");
 // 	printf("irq %x\n", USB.INTFLAGSBCLR);
 	int8_t fifo_read_pos;

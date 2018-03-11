@@ -17,12 +17,15 @@
 void audio_mic_interface_enable()
 {
 	printf("Mic en\n");
+	ADCB.CTRLA |= ADC_ENABLE_bm; //| ADC_DMASEL_CH01_gc;
+	AUDIO_MIC_ADC_SAMPLE_TIMER.PERBUF = audio_mem.mcu_clock/audio_mem.mic_sampleRate - 1;
 }
 
 
 
 void audio_mic_interface_disable()
 {
+	ADCB.CTRLA &= ~ADC_ENABLE_bm; //| ADC_DMASEL_CH01_gc;
 }
 
 
@@ -38,11 +41,25 @@ void audio_mic_reset()
 
 void audio_mic_callback0(USB_EP_t *ep)
 {
-	ep->CNT = 200;
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].DATAPTR = (uint16_t)&audio_mem.mic_buffer0;
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].AUXDATA = 0;
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].CNT = AUDIO_STREAM_EPSIZE;
+// 
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm);
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].DATAPTR = (uint16_t)&audio_mem.mic_buffer1;
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].AUXDATA = 0;
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].CNT = AUDIO_STREAM_EPSIZE;
+// // 	printf("3:%X\n", usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].STATUS & (USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm));
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].STATUS &= ~(USB_EP_BUSNACK1_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
+// 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].STATUS &= ~(USB_EP_BUSNACK1_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
+// 	ep->CNT = 200;
 // 	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & 0x7F].ep[0].STATUS = ~(USB_EP_BUSNACK0_bm | USB_EP_BUSNACK1_bm | USB_EP_SETUP_bm | USB_EP_TRNCOMPL0_bm | USB_EP_TRNCOMPL1_bm | USB_EP_OVF_bm);
-	usb_ep0_in(2);
-	printf("!!!!mic\n");
+// 	usb_ep0_in(2);
+// 	printf("!%x\n", usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].STATUS);
+// 	printf("!%d\n",usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].CNT);
 }
+
+
 
 void audio_mic_adc_init()
 {
@@ -53,8 +70,8 @@ void audio_mic_adc_init()
 	NVM_CMD = NVM_CMD_NO_OPERATION_gc;
 
 	
-	
-  ADCB.CTRLB = ADC_IMPMODE_bm | ADC_CONMODE_bm | ADC_RESOLUTION_12BIT_gc; //ADC_FREERUN_bm
+	//ADCB.CTRLA = ADC_DMASEL_CH01_gc; //For stereo
+  ADCB.CTRLB = ADC_IMPMODE_bm | ADC_CONMODE_bm | ADC_RESOLUTION_LEFT12BIT_gc; //ADC_FREERUN_bm
 	ADCB.REFCTRL = ADC_REFSEL_INTVCC_gc;                                    //Reference Voltage
 	ADCB.EVCTRL = ADC_SWEEP_0_gc | ADC_EVSEL_7_gc | ADC_EVACT_CH0_gc;       //You need to change this if you want stereo
 	ADCB.PRESCALER = ADC_PRESCALER_DIV512_gc;                               //For 96kHz you maybe need faster conversion
@@ -62,9 +79,9 @@ void audio_mic_adc_init()
 	
 	ADCB.CH0.CTRL = ADC_CH_INPUTMODE_DIFF_gc;
 	ADCB.CH0.MUXCTRL = ADC_CH_MUXPOS_PIN0_gc | ADC_CH_MUXNEG_PIN1_gc; //PB0 + PB1
-	ADCB.CH0.INTCTRL = ADC_CH_INTLVL_MED_gc;
-	ADCB.CTRLA = ADC_ENABLE_bm; //| ADC_DMASEL_CH01_gc;
+	ADCB.CH0.INTCTRL = ADC_CH_INTLVL_OFF_gc;
 }
+
 
 void audio_mic_init()
 {
@@ -81,8 +98,8 @@ void audio_mic_init()
 	
 	//TODO: get this from my sample
 	//Event channel for trigger the DMA
-	EVSYS.CH1MUX                     = EVSYS_CHMUX_ADCB_CH0_gc;
-	EVSYS.CH1CTRL                    = 0;
+	EVSYS.CH2MUX                     = EVSYS_CHMUX_ADCB_CH0_gc;
+	EVSYS.CH2CTRL                    = 0;
 	
 	//Event channel for trigger the ADC
 	EVSYS.CH7MUX                     = EVSYS_CHMUX_TCC1_OVF_gc; //Route Timer through eventcontroller for clearing timer interrupt
@@ -96,11 +113,11 @@ void audio_mic_init()
 	DMA.CTRL = DMA_ENABLE_bm | DMA_DBUFMODE_CH01_gc;
 
 	DMA.CH2.CTRLA = DMA_CH_BURSTLEN_2BYTE_gc | DMA_CH_SINGLE_bm | DMA_CH_REPEAT_bm;
-	DMA.CH2.CTRLB = DMA_CH_TRNINTLVL_OFF_gc | DMA_CH_TRNIF_bm | DMA_CH_ERRIF_bm;
+	DMA.CH2.CTRLB = DMA_CH_TRNINTLVL_MED_gc | DMA_CH_TRNIF_bm | DMA_CH_ERRIF_bm;
 	
 	DMA.CH3.CTRLA = DMA_CH_BURSTLEN_2BYTE_gc | DMA_CH_SINGLE_bm | DMA_CH_REPEAT_bm;
 
-	DMA.CH3.CTRLB = DMA_CH_TRNINTLVL_OFF_gc | DMA_CH_TRNIF_bm | DMA_CH_ERRIF_bm;
+	DMA.CH3.CTRLB = DMA_CH_TRNINTLVL_MED_gc | DMA_CH_TRNIF_bm | DMA_CH_ERRIF_bm;
 	
 	DMA.CH2.TRIGSRC = DMA_CH_TRIGSRC_EVSYS_CH2_gc;
 	DMA.CH3.TRIGSRC = DMA_CH_TRIGSRC_EVSYS_CH2_gc;
@@ -138,13 +155,20 @@ void audio_mic_init()
 
 ISR(DMA_CH2_vect)
 {
-	DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm;
-	printf("complete\n");
+	DMA.CH2.CTRLB |= DMA_CH_TRNIF_bm;
+
+	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].AUXDATA = 0;
+	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].CNT = AUDIO_STREAM_EPSIZE;
+
+// 	printf("2:%X\n", usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].STATUS & (USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm));
+	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm | USB_EP_BUSNACK1_bm | USB_EP_TRNCOMPL1_bm);
 }
 
 ISR(DMA_CH3_vect)
 {
-	DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm;
-
-	printf("complete1\n");
+	DMA.CH3.CTRLB |= DMA_CH_TRNIF_bm;
+	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].AUXDATA = 0;
+	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].CNT = AUDIO_STREAM_EPSIZE;
+// 	printf("3:%X\n", usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[0].STATUS & (USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm));
+	usb_mem.ep[AUDIO_STREAM_MIC_EPADDR & ~0x80].ep[1].STATUS &= ~(USB_EP_BUSNACK0_bm | USB_EP_TRNCOMPL0_bm | USB_EP_OVF_bm | USB_EP_BUSNACK1_bm | USB_EP_TRNCOMPL1_bm);
 }

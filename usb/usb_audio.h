@@ -75,8 +75,8 @@ typedef struct
 	uint16_t                TotalLength; /**< Total length of the Audio class-specific descriptors, including this descriptor. */
 
 	uint8_t                 InCollection; /**< Total number of Audio Streaming interfaces linked to this Audio Control interface (must be 1). */
-	uint8_t                 InterfaceNumber; /**< Interface number of the associated Audio Streaming interface. */
 } __attribute__ ((packed)) USB_Audio_Descriptor_Interface_AC_t;
+
 
 typedef struct
 {

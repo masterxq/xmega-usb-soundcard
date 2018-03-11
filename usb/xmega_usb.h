@@ -9,7 +9,7 @@
 #include <avr/iox256a3u.h>
 #endif
 
-#define NUM_EP 2
+#define NUM_EP 3
 
 //This functions types of functions will be called if the transaction is complete on the coresponding endpoint.
 typedef void (*ep_callback_action)(USB_EP_t *ep);
@@ -41,8 +41,8 @@ typedef struct usb_memory
 {
 	USB_EP_t *ptr[NUM_EP * 2];
 	USB_EP_pair_t ep[NUM_EP];
-	uint8_t ep0_in_buf[128];
-	uint8_t ep0_out_buf[64]; //For holding bigger endpoint configurations and send them as multipackage the size is set to 128
+	uint8_t ep0_in_buf[256]; //For holding bigger endpoint configurations and send them as multipackage the size is set to 128
+	uint8_t ep0_out_buf[64];
 	union {
 		struct {
 			volatile ep_callback_action out;

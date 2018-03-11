@@ -15,7 +15,7 @@
 
 #include <usb/xmega_usb.h>
 
-#include "audio.h"
+#include "audio/audio_control.h"
 
 int main(void)
 {
@@ -46,9 +46,9 @@ int main(void)
   printf("booting %d\n", USB.INTFLAGSBCLR);
 
   _delay_ms(1000);
-	
+
 	stdbuf_work();
-	
+
 	usb_init(&audio_setup_out, NULL);
 	audio_init();
 	sei();

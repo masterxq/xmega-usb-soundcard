@@ -55,7 +55,7 @@ TARGET = main
 
 
 # List C source files here. The main target is automatically added. (C dependencies are automatically generated.)
-SRC = output_buffer/stdbuf.c usb/xmega_usb.c usb/usb_default_request.c usb/descriptor.c audio.c uart/uart.c osc/osc.c
+SRC = output_buffer/stdbuf.c usb/xmega_usb.c usb/usb_default_request.c usb/descriptor.c audio/audio_control.c audio/audio_speaker.c audio/audio_mic.c uart/uart.c osc/osc.c
 
 
 AVRDUDE_PORT = usb

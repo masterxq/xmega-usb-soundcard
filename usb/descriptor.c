@@ -7,6 +7,7 @@
 #include <avr/pgmspace.h>
 
 #include <string.h>
+#include <cfg/usb_sound_cfg.h>
 
 const USB_DeviceDescriptor PROGMEM device_descriptor = {
 	.bLength = sizeof(USB_DeviceDescriptor),
@@ -36,7 +37,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 		.bLength = sizeof(USB_ConfigurationDescriptor),
 		.bDescriptorType = USB_DTYPE_Configuration,
 		.wTotalLength  = sizeof(ConfigDesc),
-		.bNumInterfaces = 2,
+		.bNumInterfaces = 3, //One control, one input (alt0 + alt1), one output (alt0 + alt1)
 		
 		.bConfigurationValue = 1,
 		.iConfiguration = 0,
@@ -59,16 +60,21 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 			.iInterface = 0
 		},
 		.Audio_ControlInterface_SPC = {
-			.Size = sizeof(USB_Audio_Descriptor_Interface_AC_t),
+			.Size = sizeof(USB_Audio_Descriptor_Interface_AC_t)
+			      + sizeof(configuration_descriptor.interfaceList),
 			.Type = USB_DTYPE_CSInterface,
 			.Subtype = AUDIO_DSUBTYPE_CSInterface_Header,
 			.ACSpecification = 0x0100,
 			.TotalLength = (sizeof(USB_Audio_Descriptor_Interface_AC_t)
 			              + sizeof(USB_Audio_Descriptor_InputTerminal_t)
-			              + sizeof(USB_Audio_Descriptor_OutputTerminal_t)),
-			.InCollection = 1, /**< Total number of Audio Streaming interfaces linked to this Audio Control interface (must be 1). */
-			.InterfaceNumber = INTERFACE_ID_AudioStream, /**< Interface number of the associated Audio Streaming interface. */
+			              + sizeof(USB_Audio_Descriptor_OutputTerminal_t)
+			              + sizeof(configuration_descriptor.interfaceList)),
+			.InCollection = 2, /**< Total number of Audio Streaming interfaces linked to this Audio Control interface (must be number of interfaces). */
+// 			.InterfaceNumber = INTERFACE_ID_AudioStream, /**< Interface number of the associated Audio Streaming interface. */
 		},
+		.interfaceList = {INTERFACE_ID_AudioStream_Speaker, INTERFACE_ID_AudioStream_Mic},
+
+
 		.Audio_InputTerminal = {
 			.Size = sizeof(USB_Audio_Descriptor_InputTerminal_t),
 			.Type = USB_DTYPE_CSInterface,
@@ -97,12 +103,13 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 
 			.TerminalStrIndex         = 0
 		},
-	
-	
+		
+
+
 	.Audio_StreamInterface_Alt0 = {
 		.bLength = sizeof(USB_InterfaceDescriptor),
 		.bDescriptorType = USB_DTYPE_Interface,
-		.bInterfaceNumber = INTERFACE_ID_AudioStream,
+		.bInterfaceNumber = INTERFACE_ID_AudioStream_Speaker,
 		.bAlternateSetting = 0,
 
 		.bNumEndpoints = 0,
@@ -116,7 +123,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 		.bLength = sizeof(USB_InterfaceDescriptor),
 		.bDescriptorType = USB_DTYPE_Interface,
 		
-		.bInterfaceNumber = INTERFACE_ID_AudioStream,
+		.bInterfaceNumber = INTERFACE_ID_AudioStream_Speaker,
 		.bAlternateSetting = 1,
 
 		.bNumEndpoints = 1,
@@ -174,7 +181,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 					.bLength = sizeof(USB_Audio_Descriptor_StreamEndpoint_Std_t),
 					.bDescriptorType = USB_DTYPE_Endpoint,
 
-					.bEndpointAddress     = AUDIO_STREAM_EPADDR,
+					.bEndpointAddress     = AUDIO_STREAM_SPEAKER_EPADDR,
 					.bmAttributes          = (USB_EP_TYPE_ISOCHRONOUS | ENDPOINT_ATTR_SYNC | ENDPOINT_USAGE_DATA),
 					.wMaxPacketSize        = AUDIO_STREAM_EPSIZE,
 					.bInterval   = 0x01
@@ -188,6 +195,107 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 		{
 			.Size = sizeof(USB_Audio_Descriptor_StreamEndpoint_Spc_t),
 			.Type = USB_DTYPE_CSEndpoint,
+			.Subtype                  = AUDIO_DSUBTYPE_CSEndpoint_General,
+
+			.Attributes               = (AUDIO_EP_ACCEPTS_SMALL_PACKETS | AUDIO_EP_SAMPLE_FREQ_CONTROL),
+
+			.LockDelayUnits           = 0x00,
+			.LockDelay                = 0x0000
+		},
+
+		//Microphone
+		.Audio_MicStreamInterface_Alt0 =
+		{
+			.bLength                  = sizeof(USB_InterfaceDescriptor),
+			.bDescriptorType          = USB_DTYPE_Interface,
+
+			.bInterfaceNumber         = INTERFACE_ID_AudioStream_Mic,
+			.bAlternateSetting        = 0,
+
+			.bNumEndpoints            = 0,
+
+			.bInterfaceClass          = AUDIO_CSCP_AudioClass,
+			.bInterfaceSubClass       = AUDIO_CSCP_AudioStreamingSubclass,
+			.bInterfaceProtocol       = AUDIO_CSCP_StreamingProtocol,
+
+			.iInterface               = 0,
+		},
+
+	.Audio_MicStreamInterface_Alt1 =
+		{
+			.bLength                  = sizeof(USB_InterfaceDescriptor),
+			.bDescriptorType          = USB_DTYPE_Interface,
+
+			.bInterfaceNumber         = INTERFACE_ID_AudioStream_Mic,
+			.bAlternateSetting        = 1,
+
+			.bNumEndpoints            = 1,
+
+			.bInterfaceClass          = AUDIO_CSCP_AudioClass,
+			.bInterfaceSubClass       = AUDIO_CSCP_AudioStreamingSubclass,
+			.bInterfaceProtocol       = AUDIO_CSCP_StreamingProtocol,
+
+			.iInterface               = 0
+		},
+
+		.Audio_MicStreamInterface_SPC =
+		{
+			.Size                     = sizeof(USB_Audio_Descriptor_Interface_AS_t), 
+			.Type                     = USB_DTYPE_CSInterface,
+			.Subtype                  = AUDIO_DSUBTYPE_CSInterface_General,
+
+			.TerminalLink             = 0x02,
+
+			.FrameDelay               = 1,
+			.AudioFormat              = 0x0001
+		},
+
+		.Audio_MicAudioFormat =
+			{
+				.Size                     = sizeof(USB_Audio_Descriptor_Format_t) +
+				                            sizeof(configuration_descriptor.Audio_MicAudioFormatSampleRates),
+				.Type                     = USB_DTYPE_CSInterface,
+				.Subtype                  = AUDIO_DSUBTYPE_CSInterface_FormatType,
+
+				.FormatType               = 0x01,
+				.Channels                 = 0x01,
+
+				.SubFrameSize             = 0x02,
+				.BitResolution            = 16,
+
+				.TotalDiscreteSampleRates = (sizeof(configuration_descriptor.Audio_MicAudioFormatSampleRates) / sizeof(USB_Audio_SampleFreq_t))
+			},
+
+		.Audio_MicAudioFormatSampleRates =
+			{
+				AUDIO_SAMPLE_FREQ(8000),
+				AUDIO_SAMPLE_FREQ(11025),
+				AUDIO_SAMPLE_FREQ(22050),
+				AUDIO_SAMPLE_FREQ(44100),
+				AUDIO_SAMPLE_FREQ(48000),
+			},
+// 
+		.Audio_MicStreamEndpoint =
+		{
+			.Endpoint =
+			{
+				.bLength             = sizeof(USB_Audio_Descriptor_StreamEndpoint_Std_t), 
+				.bDescriptorType     = USB_DTYPE_Endpoint,
+
+				.bEndpointAddress    = AUDIO_STREAM_MIC_EPADDR,
+				.bmAttributes        = (USB_EP_TYPE_ISOCHRONOUS | ENDPOINT_ATTR_SYNC | ENDPOINT_USAGE_DATA),
+				.wMaxPacketSize      = AUDIO_STREAM_EPSIZE,
+				.bInterval           = 0x01
+			},
+
+			.Refresh               = 0,
+			.SyncEndpointNumber    = 0
+		},
+
+	.Audio_MicStreamEndpoint_SPC =
+		{
+			.Size                     = sizeof(USB_Audio_Descriptor_StreamEndpoint_Spc_t),
+			.Type                     = USB_DTYPE_CSEndpoint,
 			.Subtype                  = AUDIO_DSUBTYPE_CSEndpoint_General,
 
 			.Attributes               = (AUDIO_EP_ACCEPTS_SMALL_PACKETS | AUDIO_EP_SAMPLE_FREQ_CONTROL),

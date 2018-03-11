@@ -240,6 +240,7 @@ bool ep_config(uint8_t ep_num, void* in_buf, void* out_buf, USB_EP_TYPE_t ep_typ
 
 bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_size, ep_callback_action callback_out, ep_callback_action callback_in)
 {
+	ep_num &= ~(1 << 7);
 	if(ep_num >= NUM_EP)
 	{
 		printf_P(PSTR("Invalid ep: %d, max: %d\n"), ep_num, NUM_EP);
@@ -377,7 +378,8 @@ ISR(USB_TRNCOMPL_vect)
 
 
 
-ISR(USB_BUSEVENT_vect){
+ISR(USB_BUSEVENT_vect)
+{
 	printf_P(PSTR("Busevent "));
 	if (USB.INTFLAGSACLR & USB_SOFIF_bm){
 		USB.INTFLAGSACLR = USB_SOFIF_bm;

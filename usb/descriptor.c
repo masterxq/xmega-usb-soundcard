@@ -211,7 +211,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 
 					.bEndpointAddress     = AUDIO_STREAM_SPEAKER_EPADDR,
 					.bmAttributes          = (USB_EP_TYPE_ISOCHRONOUS | ENDPOINT_ATTR_ASYNC | ENDPOINT_USAGE_DATA),
-					.wMaxPacketSize        = AUDIO_STREAM_EPSIZE,
+					.wMaxPacketSize        = AUDIO_STREAM_SPEAKER_EPSIZE,
 					.bInterval   = 0x01
 				},
 
@@ -225,7 +225,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 			.Type = USB_DTYPE_CSEndpoint,
 			.Subtype                  = AUDIO_DSUBTYPE_CSEndpoint_General,
 
-			.Attributes               = (AUDIO_EP_ACCEPTS_SMALL_PACKETS | AUDIO_EP_SAMPLE_FREQ_CONTROL),
+			.Attributes               = (AUDIO_EP_SAMPLE_FREQ_CONTROL), //AUDIO_EP_ACCEPTS_SMALL_PACKETS
 
 			.LockDelayUnits           = 0x00,
 			.LockDelay                = 0x0000
@@ -272,7 +272,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 			.Type                     = USB_DTYPE_CSInterface,
 			.Subtype                  = AUDIO_DSUBTYPE_CSInterface_General,
 
-			.TerminalLink             = 0x02,
+			.TerminalLink             = 0x04,
 
 			.FrameDelay               = 1,
 			.AudioFormat              = 0x0001
@@ -312,7 +312,7 @@ const PROGMEM ConfigDesc configuration_descriptor = {
 
 				.bEndpointAddress    = AUDIO_STREAM_MIC_EPADDR,
 				.bmAttributes        = (USB_EP_TYPE_ISOCHRONOUS | ENDPOINT_ATTR_SYNC | ENDPOINT_USAGE_DATA),
-				.wMaxPacketSize      = AUDIO_STREAM_EPSIZE,
+				.wMaxPacketSize      = AUDIO_STREAM_MIC_EPSIZE,
 				.bInterval           = 0x01
 			},
 

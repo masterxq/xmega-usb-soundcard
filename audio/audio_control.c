@@ -131,6 +131,7 @@ bool audio_setup_out(void)
 						return true;
 					}
 			}
+			audio_unknown_setup(PSTR("getCurrent"));
 	}
 	printf("audio out bm: %x b: %x\n", usb_mem.setup_pkg.bmRequestType, usb_mem.setup_pkg.bRequest);
 	return false;
@@ -184,7 +185,7 @@ static inline void sync_mcu_freq(uint16_t size, uint8_t time)
 	
 	static uint32_t clks_total;
 	static uint32_t size_total;
-	if(audio_mem.mcu_sync_counter < 16000)
+	if(audio_mem.mcu_sync_counter < 2048)
 	{
 		audio_mem.mcu_sync_counter++;
 		if(audio_mem.mcu_sync_counter < 512)
@@ -197,7 +198,7 @@ static inline void sync_mcu_freq(uint16_t size, uint8_t time)
 		clks_total += time;
 		size_total += size;
 
-		if(audio_mem.mcu_sync_counter == 16000)
+		if(audio_mem.mcu_sync_counter == 2048)
 		{
 			uint64_t frq = clks_total * 1024;
 			frq = frq * (uint64_t)audio_mem.speaker_sampleRate;
@@ -210,6 +211,7 @@ static inline void sync_mcu_freq(uint16_t size, uint8_t time)
 			audio_mem.speaker_middleCLKsPerSample = 0;
 			//Setup mic sample rate
 			audio_mem.mic_teoriticalCLKsPerSample = (audio_mem.mcu_clock/audio_mem.mic_sampleRate) - 1;
+			AUDIO_MIC_ADC_SAMPLE_TIMER.PERBUF = audio_mem.mic_teoriticalCLKsPerSample;
 			audio_mem.mic_middleCLKsPerSample = 0;
 			audio_mem.mcu_synced = true;
 // 			uint16_t val = (((uint32_t)audio_mem.mcu_clock * 2) + 1000000UL*8)/(1000000UL*16) - 1; //TODO: Very dirty should be done somewhere but not here

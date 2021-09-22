@@ -193,6 +193,8 @@ void usb_reset(void)
 	USB.EPPTR = (unsigned) &usb_mem.ep[0].ep[0];
 	USB.ADDR = 0;
 	
+	USB.CTRLB &= ~USB_ATTACH_bm;
+	
 	usb_mem.ep[0].out.STATUS = 0;
 	usb_mem.ep[0].out.CTRL = USB_EP_TYPE_CONTROL_gc | USB_EP_BUFSIZE_64_gc;
 	usb_mem.ep[0].out.DATAPTR = (unsigned) usb_mem.ep0_out_buf;
@@ -262,7 +264,7 @@ bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_s
 	ep_ptr->DATAPTR = (unsigned) buf0;
 	ep_ptr->CNT = 0;
 	ep_ptr->AUXDATA = 0;
-	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc; //Dont sure if pingpong is needed if isochronous
+	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) /*| USB_EP_MULTIPKT_bm*/ | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc; //Dont sure if pingpong is needed if isochronous
 // 	printf("CTRL: 0x%02X\n", ep_ptr->CTRL);
 	ep_ptr->STATUS = 0;
 
@@ -271,7 +273,7 @@ bool ep_config_isochronous(uint8_t ep_num, void* buf0, void* buf1, uint16_t ep_s
 	ep_ptr->DATAPTR = (unsigned) buf1;
 	ep_ptr->CNT = 0;
 	ep_ptr->AUXDATA = 0;
-	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc;
+	ep_ptr->CTRL = USB_EP_size_to_gc(ep_size) /*| USB_EP_MULTIPKT_bm*/ | USB_EP_PINGPONG_bm | USB_EP_TYPE_ISOCHRONOUS_gc;
 	ep_ptr->STATUS = 0;
 
 
@@ -347,10 +349,10 @@ ISR(USB_TRNCOMPL_vect)
 		*/
 		uint16_t ep_location = *(uint16_t*)(USB.EPPTR + (fifo_read_pos * 2)); //Pointer size == 2 bytes
 		uint8_t ep_num = (ep_location - USB.EPPTR) >> 3;                      //We divide with 8 == sizeof(USB_EP_t)
-		if(ep_num >= 2 * NUM_EP)                                              //Just for the case something went wrong.
-		{
-			printf("ep callback out of range!!!!!");
-		}
+// 		if(ep_num >= 2 * NUM_EP)                                              //Just for the case something went wrong.
+// 		{
+// 			printf("ep callback out of range!!!!!");
+// 		}
 
 		usb_mem.callback.outin[ep_num]((USB_EP_t *)ep_location);              //The coresponding EP function pointer is called.
 

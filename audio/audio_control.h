@@ -8,15 +8,15 @@
 
 typedef struct audio_buffer
 {
-	uint8_t audio_buffer[AUDIO_STREAM_EPSIZE];
+	uint8_t audio_buffer[AUDIO_STREAM_SPEAKER_EPSIZE];
 	volatile uint16_t size;
 } audio_buffer_t;
 
 typedef struct audio_memory
 {
 	audio_buffer_t buffer[AUDIO_BUFFER_INSTANCES];
-	uint8_t mic_buffer0[AUDIO_STREAM_EPSIZE];
-	uint8_t mic_buffer1[AUDIO_STREAM_EPSIZE];
+	uint8_t mic_buffer0[AUDIO_STREAM_MIC_EPSIZE];
+	uint8_t mic_buffer1[AUDIO_STREAM_MIC_EPSIZE];
 	uint16_t mcu_sync_counter;
 
 	bool mcu_synced;

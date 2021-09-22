@@ -39,9 +39,9 @@ void audio_speaker_reset()
 	audio_mem._bank_in_work0 = 0;
 	audio_mem._bank_in_work1 = 1;
 	if(audio_mem.mcu_synced)
-		ep_config_isochronous(AUDIO_STREAM_SPEAKER_EPADDR, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_speaker_data_out0, &audio_speaker_data_out1);
+		ep_config_isochronous(AUDIO_STREAM_SPEAKER_EPADDR, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_SPEAKER_EPSIZE, &audio_speaker_data_out0, &audio_speaker_data_out1);
 	else
-		ep_config_isochronous(AUDIO_STREAM_SPEAKER_EPADDR, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_EPSIZE, &audio_data_out_sync_clk0, &audio_data_out_sync_clk1);
+		ep_config_isochronous(AUDIO_STREAM_SPEAKER_EPADDR, audio_mem.buffer[0].audio_buffer, audio_mem.buffer[1].audio_buffer, AUDIO_STREAM_SPEAKER_EPSIZE, &audio_data_out_sync_clk0, &audio_data_out_sync_clk1);
 }
 
 void audio_speaker_init()
